@@ -1,14 +1,9 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateToken = generateToken;
-exports.getUserFromToken = getUserFromToken;
-exports.setAuthCookie = setAuthCookie;
-exports.parseCookies = parseCookies;
-function generateToken(userId) {
-}
-function getUserFromToken(token) {
-}
-function setAuthCookie(res, token) {
-}
-function parseCookies(req) {
-}
+// export function generateToken(userId: string): string {
+// }
+// export function getUserFromToken(token: string): User | null {
+// }
+// export function setAuthCookie(res: ServerResponse, token: string) {
+// }
+// export function parseCookies(req: IncomingMessage): Record<string, string> {
+// }
