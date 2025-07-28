@@ -1,0 +1,24 @@
+{
+  "name": "m3_carshop_nodejs",
+  "version": "1.0.0",
+  "description": "## Opis Projekt umożliwia rejestrację, logowanie, zarządzanie użytkownikami i samochodami oraz symulację zakupu samochodów.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:server": "node --watch dist/index.js",
+    "dev": "tsc --watch --preserveWatchOutput"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LukSt92/M3_CarShop_NodeJS.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LukSt92/M3_CarShop_NodeJS/issues"
+  },
+  "homepage": "https://github.com/LukSt92/M3_CarShop_NodeJS#readme",
+  "devDependencies": {
+    "@types/node": "^24.1.0"
+  }
+}
