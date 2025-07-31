@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const http_1 = require("http");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
+const db_1 = require("./db");
 const PORT = 3000;
 const frontendPath = path_1.default.join(__dirname, "..", "frontend");
 const MIME_TYPES = {
@@ -32,6 +33,8 @@ const server = (0, http_1.createServer)(async (req, res) => {
         return sendFile(res, `${frontendPath}/style.css`);
     if (method === "GET" && (pathname === null || pathname === void 0 ? void 0 : pathname.startsWith("/main.js")))
         return sendFile(res, `${frontendPath}/main.js`);
+    if (method === "POST" && pathname === "/register")
+        return (0, db_1.registerUser)(res, req);
     res.end(JSON.stringify({ status: "ok" }));
     console.log(__dirname);
     // 1. Obsługa endpointów

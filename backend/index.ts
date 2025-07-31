@@ -3,6 +3,7 @@ import fs from "fs";
 import url from "url";
 import path from "path";
 import { Mimes } from "./types";
+import { registerUser } from "./db";
 
 const PORT = 3000;
 const frontendPath = path.join(__dirname, "..", "frontend");
@@ -34,6 +35,8 @@ const server = createServer(
     if (method === "GET" && pathname?.startsWith("/main.js"))
       return sendFile(res, `${frontendPath}/main.js`);
 
+    if (method === "POST" && pathname === "/register")
+      return registerUser(res, req);
     res.end(JSON.stringify({ status: "ok" }));
 
     console.log(__dirname);
