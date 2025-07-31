@@ -35,11 +35,12 @@ const server = (0, http_1.createServer)(async (req, res) => {
         return sendFile(res, `${frontendPath}/main.js`);
     if (method === "POST" && pathname === "/register")
         return (0, db_1.registerUser)(res, req);
-    if (method === "GET" && pathname === "/users") {
-        res
-            .writeHead(200, { "Content-Type": "application/json" })
-            .end(JSON.stringify((0, db_1.getUsers)()));
-    }
+    // TODO dodać ciasteczko i za jego pomocą sprawdzić czy użytkownik jest zalogowany oraz czy jest adminem.
+    // if (method === "GET" && pathname === "/users") {
+    //   res
+    //     .writeHead(200, { "Content-Type": "application/json" })
+    //     .end(JSON.stringify(getUsers()));
+    // }
     if (method === "POST" && pathname === "/login")
         return (0, db_1.loginUser)(res, req);
     res.end(JSON.stringify({ status: "ok" }));
