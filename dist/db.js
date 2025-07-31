@@ -8,6 +8,7 @@ exports.getUsers = getUsers;
 exports.registerUser = registerUser;
 const path_1 = require("path");
 const fs_1 = __importDefault(require("fs"));
+const utlis_1 = require("./utlis");
 const USERS_DB = (0, path_1.join)(__dirname, "..", "db", "users.json");
 function saveUsers(users) {
     fs_1.default.writeFileSync(USERS_DB, JSON.stringify(users, null, 2), "utf-8");
@@ -19,28 +20,23 @@ function getUsers() {
     return usersData;
 }
 async function registerUser(res, req) {
-    let body = "";
-    req.on("data", (chunk) => {
-        body += chunk;
-    });
-    req.on("end", async () => {
-        const { username, password } = await JSON.parse(body);
-        const users = getUsers();
-        if (users.find((u) => u.username === username))
-            res
-                .writeHead(400, { "content-type": "application/json" })
-                .end(JSON.stringify({ error: "Błędna nazwa użytkownika, podaj inną." }));
-        const newUser = {
-            id: `${username}${Date.now()}`,
-            username,
-            password,
-            role: "user",
-            balance: 50000,
-        };
-        users.push(newUser);
-        saveUsers(users);
+    const body = await (0, utlis_1.getData)(req);
+    const { username, password } = await JSON.parse(body);
+    const users = getUsers();
+    if (users.find((u) => u.username === username))
         res
-            .writeHead(201, { "content-type": "application/json" })
-            .end(JSON.stringify({}));
-    });
+            .writeHead(400, { "content-type": "application/json" })
+            .end(JSON.stringify({ error: "Błędna nazwa użytkownika, podaj inną." }));
+    const newUser = {
+        id: `${username}${Date.now()}`,
+        username,
+        password,
+        role: "user",
+        balance: 50000,
+    };
+    users.push(newUser);
+    saveUsers(users);
+    res
+        .writeHead(201, { "content-type": "application/json" })
+        .end(JSON.stringify({}));
 }

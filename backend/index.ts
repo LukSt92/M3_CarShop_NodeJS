@@ -3,7 +3,7 @@ import fs from "fs";
 import url from "url";
 import path from "path";
 import { Mimes } from "./types";
-import { registerUser } from "./db";
+import { getUsers, registerUser } from "./db";
 
 const PORT = 3000;
 const frontendPath = path.join(__dirname, "..", "frontend");
@@ -37,9 +37,14 @@ const server = createServer(
 
     if (method === "POST" && pathname === "/register")
       return registerUser(res, req);
-    res.end(JSON.stringify({ status: "ok" }));
 
-    console.log(__dirname);
+    if (method === "GET" && pathname === "/users") {
+      res
+        .writeHead(200, { "Content-Type": "application/json" })
+        .end(JSON.stringify(getUsers()));
+    }
+
+    res.end(JSON.stringify({ status: "ok" }));
     // 1. Obsługa endpointów
     // 2. Proste serwowanie plików statycznych z katalogu frontend (np. pod ścieżką /static/)
   }

@@ -4,6 +4,7 @@ import { join } from "path";
 import fs from "fs";
 import { User } from "./types";
 import { IncomingMessage, ServerResponse } from "http";
+import { getData } from "./utlis";
 
 const USERS_DB = join(__dirname, "..", "db", "users.json");
 
@@ -21,34 +22,27 @@ export async function registerUser(
   res: ServerResponse,
   req: IncomingMessage
 ): Promise<void> {
-  let body = "";
-  req.on("data", (chunk) => {
-    body += chunk;
-  });
-  req.on("end", async () => {
-    const { username, password } = await JSON.parse(body);
-    const users = getUsers();
+  const body = await getData(req);
+  const { username, password } = await JSON.parse(body);
+  const users = getUsers();
 
-    if (users.find((u) => u.username === username))
-      res
-        .writeHead(400, { "content-type": "application/json" })
-        .end(
-          JSON.stringify({ error: "Błędna nazwa użytkownika, podaj inną." })
-        );
-
-    const newUser: User = {
-      id: `${username}${Date.now()}`,
-      username,
-      password,
-      role: "user",
-      balance: 50000,
-    };
-
-    users.push(newUser);
-    saveUsers(users);
-
+  if (users.find((u) => u.username === username))
     res
-      .writeHead(201, { "content-type": "application/json" })
-      .end(JSON.stringify({}));
-  });
+      .writeHead(400, { "content-type": "application/json" })
+      .end(JSON.stringify({ error: "Błędna nazwa użytkownika, podaj inną." }));
+
+  const newUser: User = {
+    id: `${username}${Date.now()}`,
+    username,
+    password,
+    role: "user",
+    balance: 50000,
+  };
+
+  users.push(newUser);
+  saveUsers(users);
+
+  res
+    .writeHead(201, { "content-type": "application/json" })
+    .end(JSON.stringify({}));
 }

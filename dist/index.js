@@ -35,8 +35,12 @@ const server = (0, http_1.createServer)(async (req, res) => {
         return sendFile(res, `${frontendPath}/main.js`);
     if (method === "POST" && pathname === "/register")
         return (0, db_1.registerUser)(res, req);
+    if (method === "GET" && pathname === "/users") {
+        res
+            .writeHead(200, { "Content-Type": "application/json" })
+            .end(JSON.stringify((0, db_1.getUsers)()));
+    }
     res.end(JSON.stringify({ status: "ok" }));
-    console.log(__dirname);
     // 1. Obsługa endpointów
     // 2. Proste serwowanie plików statycznych z katalogu frontend (np. pod ścieżką /static/)
 });
