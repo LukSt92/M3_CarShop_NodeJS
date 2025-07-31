@@ -40,6 +40,8 @@ const server = (0, http_1.createServer)(async (req, res) => {
             .writeHead(200, { "Content-Type": "application/json" })
             .end(JSON.stringify((0, db_1.getUsers)()));
     }
+    if (method === "POST" && pathname === "/login")
+        return (0, db_1.loginUser)(res, req);
     res.end(JSON.stringify({ status: "ok" }));
     // 1. Obsługa endpointów
     // 2. Proste serwowanie plików statycznych z katalogu frontend (np. pod ścieżką /static/)

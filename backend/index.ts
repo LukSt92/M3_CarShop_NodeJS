@@ -3,7 +3,7 @@ import fs from "fs";
 import url from "url";
 import path from "path";
 import { Mimes } from "./types";
-import { getUsers, registerUser } from "./db";
+import { getUsers, loginUser, registerUser } from "./db";
 
 const PORT = 3000;
 const frontendPath = path.join(__dirname, "..", "frontend");
@@ -38,11 +38,13 @@ const server = createServer(
     if (method === "POST" && pathname === "/register")
       return registerUser(res, req);
 
-    if (method === "GET" && pathname === "/users") {
-      res
-        .writeHead(200, { "Content-Type": "application/json" })
-        .end(JSON.stringify(getUsers()));
-    }
+    // TODO dodać ciasteczko i za jego pomocą sprawdzić czy użytkownik jest zalogowany oraz czy jest adminem.
+    // if (method === "GET" && pathname === "/users") {
+    //   res
+    //     .writeHead(200, { "Content-Type": "application/json" })
+    //     .end(JSON.stringify(getUsers()));
+    // }
+    if (method === "POST" && pathname === "/login") return loginUser(res, req);
 
     res.end(JSON.stringify({ status: "ok" }));
     // 1. Obsługa endpointów

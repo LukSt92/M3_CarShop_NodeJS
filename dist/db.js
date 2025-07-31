@@ -6,6 +6,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getUsers = getUsers;
 exports.registerUser = registerUser;
+exports.loginUser = loginUser;
 const path_1 = require("path");
 const fs_1 = __importDefault(require("fs"));
 const utlis_1 = require("./utlis");
@@ -38,5 +39,19 @@ async function registerUser(res, req) {
     saveUsers(users);
     res
         .writeHead(201, { "content-type": "application/json" })
+        .end(JSON.stringify({}));
+}
+async function loginUser(res, req) {
+    const body = await (0, utlis_1.getData)(req);
+    const { username, password } = await JSON.parse(body);
+    const users = getUsers();
+    const user = users.find((u) => username === u.username && password === u.password);
+    if (!user)
+        res
+            .writeHead(401, { "content-type": "application/json" })
+            .end(JSON.stringify({ error: "Błędne dane do logowania." }));
+    // TODO dodać wywołanie funkcji która tworzy ciasteczko
+    res
+        .writeHead(200, { "content-type": "application/json" })
         .end(JSON.stringify({}));
 }

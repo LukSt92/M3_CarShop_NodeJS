@@ -46,3 +46,26 @@ export async function registerUser(
     .writeHead(201, { "content-type": "application/json" })
     .end(JSON.stringify({}));
 }
+
+export async function loginUser(
+  res: ServerResponse,
+  req: IncomingMessage
+): Promise<void> {
+  const body = await getData(req);
+  const { username, password } = await JSON.parse(body);
+  const users = getUsers();
+
+  const user = users.find(
+    (u) => username === u.username && password === u.password
+  );
+
+  if (!user)
+    res
+      .writeHead(401, { "content-type": "application/json" })
+      .end(JSON.stringify({ error: "Błędne dane do logowania." }));
+
+  // TODO dodać wywołanie funkcji która tworzy ciasteczko
+  res
+    .writeHead(200, { "content-type": "application/json" })
+    .end(JSON.stringify({}));
+}

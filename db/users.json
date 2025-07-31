@@ -124,5 +124,12 @@
     "password": "ghnghjfgbbvvv",
     "role": "user",
     "balance": 50000
+  },
+  {
+    "id": "test1753995696773",
+    "username": "test",
+    "password": "test",
+    "role": "user",
+    "balance": 50000
   }
 ]
