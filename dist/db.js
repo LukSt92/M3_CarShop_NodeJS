@@ -25,10 +25,12 @@ async function registerUser(res, req) {
     const body = await (0, utlis_1.getData)(req);
     const { username, password } = await JSON.parse(body);
     const users = getUsers();
-    if (users.find((u) => u.username === username))
+    if (users.find((u) => u.username === username)) {
         res
             .writeHead(400, { "content-type": "application/json" })
             .end(JSON.stringify({ error: "Błędna nazwa użytkownika, podaj inną." }));
+        return;
+    }
     const newUser = {
         id: `${username}${Date.now()}`,
         username,
@@ -41,6 +43,7 @@ async function registerUser(res, req) {
     res
         .writeHead(201, { "content-type": "application/json" })
         .end(JSON.stringify({}));
+    return;
 }
 async function loginUser(res, req) {
     const body = await (0, utlis_1.getData)(req);

@@ -4,6 +4,7 @@ import url from "url";
 import path from "path";
 import { Mimes } from "./types";
 import { getUsers, loginUser, registerUser } from "./db";
+import { getUserFromToken, parseCookies } from "./auth";
 
 const PORT = 3000;
 const frontendPath = path.join(__dirname, "..", "frontend");
@@ -17,7 +18,6 @@ const sendFile = (res: ServerResponse, filePath: string): void => {
   fs.readFile(filePath, (err, data) => {
     if (err) return res.writeHead(404).end("Not found.");
     const ext = path.extname(filePath);
-    console.log(ext);
     res.writeHead(200, { "content-type": MIME_TYPES[ext] || "text/plain" });
     res.end(data);
   });
@@ -39,11 +39,31 @@ const server = createServer(
       return registerUser(res, req);
 
     // TODO dodać ciasteczko i za jego pomocą sprawdzić czy użytkownik jest zalogowany oraz czy jest adminem.
-    // if (method === "GET" && pathname === "/users") {
-    //   res
-    //     .writeHead(200, { "Content-Type": "application/json" })
-    //     .end(JSON.stringify(getUsers()));
-    // }
+    if (method === "GET" && pathname === "/users") {
+      const cookies = parseCookies(req);
+      const token = cookies.token;
+      const user = getUserFromToken(token);
+
+      if (!user) {
+        res
+          .writeHead(400, { "content-type": "application/json" })
+          .end(JSON.stringify({ error: "Użytkownik nie jest zalogowany" }));
+        return;
+      } else {
+        if (user.role === "user") {
+          res
+            .writeHead(200, { "content-type": "application/json" })
+            .end(JSON.stringify(user));
+          return;
+        } else {
+          res
+            .writeHead(200, { "content-type": "application/json" })
+            .end(JSON.stringify(getUsers()));
+          return;
+        }
+      }
+    }
+
     if (method === "POST" && pathname === "/login") return loginUser(res, req);
 
     res.end(JSON.stringify({ status: "ok" }));

@@ -7,6 +7,7 @@ const http_1 = require("http");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const db_1 = require("./db");
+const auth_1 = require("./auth");
 const PORT = 3000;
 const frontendPath = path_1.default.join(__dirname, "..", "frontend");
 const MIME_TYPES = {
@@ -19,7 +20,6 @@ const sendFile = (res, filePath) => {
         if (err)
             return res.writeHead(404).end("Not found.");
         const ext = path_1.default.extname(filePath);
-        console.log(ext);
         res.writeHead(200, { "content-type": MIME_TYPES[ext] || "text/plain" });
         res.end(data);
     });
@@ -36,11 +36,31 @@ const server = (0, http_1.createServer)(async (req, res) => {
     if (method === "POST" && pathname === "/register")
         return (0, db_1.registerUser)(res, req);
     // TODO dodać ciasteczko i za jego pomocą sprawdzić czy użytkownik jest zalogowany oraz czy jest adminem.
-    // if (method === "GET" && pathname === "/users") {
-    //   res
-    //     .writeHead(200, { "Content-Type": "application/json" })
-    //     .end(JSON.stringify(getUsers()));
-    // }
+    if (method === "GET" && pathname === "/users") {
+        const cookies = (0, auth_1.parseCookies)(req);
+        const token = cookies.token;
+        const user = (0, auth_1.getUserFromToken)(token);
+        if (!user) {
+            res
+                .writeHead(400, { "content-type": "application/json" })
+                .end(JSON.stringify({ error: "Użytkownik nie jest zalogowany" }));
+            return;
+        }
+        else {
+            if (user.role === "user") {
+                res
+                    .writeHead(200, { "content-type": "application/json" })
+                    .end(JSON.stringify(user));
+                return;
+            }
+            else {
+                res
+                    .writeHead(200, { "content-type": "application/json" })
+                    .end(JSON.stringify((0, db_1.getUsers)()));
+                return;
+            }
+        }
+    }
     if (method === "POST" && pathname === "/login")
         return (0, db_1.loginUser)(res, req);
     res.end(JSON.stringify({ status: "ok" }));

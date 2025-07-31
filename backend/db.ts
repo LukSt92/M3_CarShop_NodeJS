@@ -5,7 +5,7 @@ import fs from "fs";
 import { User } from "./types";
 import { IncomingMessage, ServerResponse } from "http";
 import { getData } from "./utlis";
-import { generateToken, getUserFromToken, setAuthCookie } from "./auth";
+import { generateToken, setAuthCookie } from "./auth";
 
 const USERS_DB = join(__dirname, "..", "db", "users.json");
 
@@ -27,10 +27,12 @@ export async function registerUser(
   const { username, password } = await JSON.parse(body);
   const users = getUsers();
 
-  if (users.find((u) => u.username === username))
+  if (users.find((u) => u.username === username)) {
     res
       .writeHead(400, { "content-type": "application/json" })
       .end(JSON.stringify({ error: "Błędna nazwa użytkownika, podaj inną." }));
+    return;
+  }
 
   const newUser: User = {
     id: `${username}${Date.now()}`,
@@ -46,6 +48,7 @@ export async function registerUser(
   res
     .writeHead(201, { "content-type": "application/json" })
     .end(JSON.stringify({}));
+  return;
 }
 
 export async function loginUser(
