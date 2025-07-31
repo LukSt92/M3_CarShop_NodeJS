@@ -5,6 +5,7 @@ import fs from "fs";
 import { User } from "./types";
 import { IncomingMessage, ServerResponse } from "http";
 import { getData } from "./utlis";
+import { generateToken, getUserFromToken, setAuthCookie } from "./auth";
 
 const USERS_DB = join(__dirname, "..", "db", "users.json");
 
@@ -63,9 +64,12 @@ export async function loginUser(
     res
       .writeHead(401, { "content-type": "application/json" })
       .end(JSON.stringify({ error: "Błędne dane do logowania." }));
+  else {
+    const token = generateToken(user.id);
 
-  // TODO dodać wywołanie funkcji która tworzy ciasteczko
-  res
-    .writeHead(200, { "content-type": "application/json" })
-    .end(JSON.stringify({}));
+    setAuthCookie(res, token);
+    res
+      .writeHead(200, { "content-type": "application/json" })
+      .end(JSON.stringify({}));
+  }
 }

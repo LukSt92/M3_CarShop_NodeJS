@@ -10,6 +10,7 @@ exports.loginUser = loginUser;
 const path_1 = require("path");
 const fs_1 = __importDefault(require("fs"));
 const utlis_1 = require("./utlis");
+const auth_1 = require("./auth");
 const USERS_DB = (0, path_1.join)(__dirname, "..", "db", "users.json");
 function saveUsers(users) {
     fs_1.default.writeFileSync(USERS_DB, JSON.stringify(users, null, 2), "utf-8");
@@ -50,8 +51,11 @@ async function loginUser(res, req) {
         res
             .writeHead(401, { "content-type": "application/json" })
             .end(JSON.stringify({ error: "Błędne dane do logowania." }));
-    // TODO dodać wywołanie funkcji która tworzy ciasteczko
-    res
-        .writeHead(200, { "content-type": "application/json" })
-        .end(JSON.stringify({}));
+    else {
+        const token = (0, auth_1.generateToken)(user.id);
+        (0, auth_1.setAuthCookie)(res, token);
+        res
+            .writeHead(200, { "content-type": "application/json" })
+            .end(JSON.stringify({}));
+    }
 }
