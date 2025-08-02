@@ -35,6 +35,50 @@ export function getUsers(): User[] {
   return usersData;
 }
 
+export function getSingleCar(carId: string): Car | null {
+  const cars = getCars();
+  const carMatch = cars.find((c) => c.id === carId);
+  return carMatch ? carMatch : null;
+}
+
+export async function updateCar(
+  res: ServerResponse,
+  req: IncomingMessage,
+  pathname: string
+): Promise<void> {
+  const { token } = parseCookies(req);
+  const userFromToken = getUserFromToken(token);
+  const cars = getCars();
+  const users = getUsers();
+  const user = users.find((u) => u.id === userFromToken?.id);
+  const carId = pathname.split("/")[2];
+  const car = cars.find((c) => c.id === carId);
+
+  if (user && car) {
+    if (user.id === car.ownerId) {
+      res.writeHead(400, { "content-type": "application/json" }).end(
+        JSON.stringify({
+          error: "Nie możesz kupić już posiadanego samochodu.",
+        })
+      );
+    } else if (user.balance < car.price) {
+      res.writeHead(400, { "content-type": "application/json" }).end(
+        JSON.stringify({
+          error: "Masz niewystarczającą ilość środków by zakupić ten samochód.",
+        })
+      );
+    } else {
+      user.balance -= car.price;
+      saveUsers(users);
+      car.ownerId = user.id;
+      saveCars(cars);
+      res
+        .writeHead(200, { "content-type": "application/json" })
+        .end(JSON.stringify({}));
+    }
+  }
+}
+
 export async function addCar(
   res: ServerResponse,
   req: IncomingMessage

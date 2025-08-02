@@ -10,6 +10,7 @@ import {
   loginUser,
   registerUser,
   saveUsers,
+  updateCar,
 } from "./db";
 import { getUserFromToken, parseCookies } from "./auth";
 import { getData } from "./utlis";
@@ -131,6 +132,9 @@ const server = createServer(
     if (method === "POST" && pathname === "/cars") {
       return addCar(res, req);
     }
+
+    if (method === "POST" && pathname?.endsWith("/buy"))
+      return updateCar(res, req, pathname);
 
     res.end(JSON.stringify({ status: "ok" }));
     // 1. Obsługa endpointów

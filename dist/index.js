@@ -113,6 +113,8 @@ const server = (0, http_1.createServer)(async (req, res) => {
     if (method === "POST" && pathname === "/cars") {
         return (0, db_1.addCar)(res, req);
     }
+    if (method === "POST" && (pathname === null || pathname === void 0 ? void 0 : pathname.endsWith("/buy")))
+        return (0, db_1.updateCar)(res, req, pathname);
     res.end(JSON.stringify({ status: "ok" }));
     // 1. Obsługa endpointów
     // 2. Proste serwowanie plików statycznych z katalogu frontend (np. pod ścieżką /static/)
