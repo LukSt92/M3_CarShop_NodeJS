@@ -8,6 +8,7 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const db_1 = require("./db");
 const auth_1 = require("./auth");
+const utlis_1 = require("./utlis");
 const PORT = 3000;
 const frontendPath = path_1.default.join(__dirname, "..", "frontend");
 const MIME_TYPES = {
@@ -38,7 +39,17 @@ const server = (0, http_1.createServer)(async (req, res) => {
     // TODO dodać ciasteczko i za jego pomocą sprawdzić czy użytkownik jest zalogowany oraz czy jest adminem.
     if (method === "GET" && pathname === "/users") {
         const cookies = (0, auth_1.parseCookies)(req);
+        if (!cookies) {
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({}));
+            return;
+        }
         const token = cookies.token;
+        if (!token) {
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({}));
+            return;
+        }
         const user = (0, auth_1.getUserFromToken)(token);
         if (!user) {
             res
@@ -60,6 +71,29 @@ const server = (0, http_1.createServer)(async (req, res) => {
                 return;
             }
         }
+    }
+    const putUserPathname = pathname === null || pathname === void 0 ? void 0 : pathname.match(/^\/users\/([^\/]+)$/);
+    if (method === "PUT" && putUserPathname) {
+        const userIdToUpdate = putUserPathname[1];
+        const users = (0, db_1.getUsers)();
+        const userToUpdate = users.find((u) => u.id === userIdToUpdate);
+        const body = await (0, utlis_1.getData)(req);
+        const { username, password } = await JSON.parse(body);
+        if (!userToUpdate) {
+            res
+                .writeHead(400, { "content-type": "application/json" })
+                .end(JSON.stringify({ error: "Użytkownik nie istnieje." }));
+            return;
+        }
+        if (username && username !== userToUpdate.username)
+            userToUpdate.username = username;
+        if (password && password !== userToUpdate.password)
+            userToUpdate.password = password;
+        (0, db_1.saveUsers)(users);
+        res
+            .writeHead(200, { "content-type": "application/json" })
+            .end(JSON.stringify({}));
+        return;
     }
     if (method === "POST" && pathname === "/login")
         return (0, db_1.loginUser)(res, req);

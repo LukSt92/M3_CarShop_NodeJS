@@ -9,7 +9,7 @@ import { generateToken, setAuthCookie } from "./auth";
 
 const USERS_DB = join(__dirname, "..", "db", "users.json");
 
-function saveUsers(users: User[]): void {
+export function saveUsers(users: User[]): void {
   fs.writeFileSync(USERS_DB, JSON.stringify(users, null, 2), "utf-8");
 }
 

@@ -29,7 +29,7 @@ function getUserFromToken(token) {
     return null;
 }
 function setAuthCookie(res, token) {
-    res.setHeader("Set-Cookie", `token=${token}; Path=/; HttpOnly`);
+    res.setHeader("Set-Cookie", [`token=${token}; Path=/; HttpOnly`]);
 }
 function parseCookies(req) {
     const cookiesHeader = req.headers.cookie || "";

@@ -3,8 +3,9 @@ import fs from "fs";
 import url from "url";
 import path from "path";
 import { Mimes } from "./types";
-import { getUsers, loginUser, registerUser } from "./db";
+import { getUsers, loginUser, registerUser, saveUsers } from "./db";
 import { getUserFromToken, parseCookies } from "./auth";
+import { getData } from "./utlis";
 
 const PORT = 3000;
 const frontendPath = path.join(__dirname, "..", "frontend");
@@ -41,7 +42,20 @@ const server = createServer(
     // TODO dodać ciasteczko i za jego pomocą sprawdzić czy użytkownik jest zalogowany oraz czy jest adminem.
     if (method === "GET" && pathname === "/users") {
       const cookies = parseCookies(req);
+
+      if (!cookies) {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({}));
+        return;
+      }
       const token = cookies.token;
+
+      if (!token) {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({}));
+        return;
+      }
+
       const user = getUserFromToken(token);
 
       if (!user) {
@@ -62,6 +76,33 @@ const server = createServer(
           return;
         }
       }
+    }
+
+    const putUserPathname = pathname?.match(/^\/users\/([^\/]+)$/);
+
+    if (method === "PUT" && putUserPathname) {
+      const userIdToUpdate = putUserPathname[1];
+      const users = getUsers();
+      const userToUpdate = users.find((u) => u.id === userIdToUpdate);
+      const body = await getData(req);
+      const { username, password } = await JSON.parse(body);
+
+      if (!userToUpdate) {
+        res
+          .writeHead(400, { "content-type": "application/json" })
+          .end(JSON.stringify({ error: "Użytkownik nie istnieje." }));
+        return;
+      }
+      if (username && username !== userToUpdate.username)
+        userToUpdate.username = username;
+      if (password && password !== userToUpdate.password)
+        userToUpdate.password = password;
+
+      saveUsers(users);
+      res
+        .writeHead(200, { "content-type": "application/json" })
+        .end(JSON.stringify({}));
+      return;
     }
 
     if (method === "POST" && pathname === "/login") return loginUser(res, req);

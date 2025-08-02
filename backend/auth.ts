@@ -26,7 +26,7 @@ export function getUserFromToken(token: string): User | null {
 }
 
 export function setAuthCookie(res: ServerResponse, token: string) {
-  res.setHeader("Set-Cookie", `token=${token}; Path=/; HttpOnly`);
+  res.setHeader("Set-Cookie", [`token=${token}; Path=/; HttpOnly`]);
 }
 
 export function parseCookies(req: IncomingMessage): Record<string, string> {

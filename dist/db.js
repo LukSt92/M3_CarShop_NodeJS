@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.saveUsers = saveUsers;
 exports.getUsers = getUsers;
 exports.registerUser = registerUser;
 exports.loginUser = loginUser;
