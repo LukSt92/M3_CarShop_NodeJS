@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getCars = getCars;
 exports.saveUsers = saveUsers;
 exports.getUsers = getUsers;
 exports.registerUser = registerUser;
@@ -13,6 +14,13 @@ const fs_1 = __importDefault(require("fs"));
 const utlis_1 = require("./utlis");
 const auth_1 = require("./auth");
 const USERS_DB = (0, path_1.join)(__dirname, "..", "db", "users.json");
+const CARS_DB = (0, path_1.join)(__dirname, "..", "db", "cars.json");
+function getCars() {
+    if (!fs_1.default.existsSync(CARS_DB))
+        return [];
+    const carsData = JSON.parse(fs_1.default.readFileSync(CARS_DB, "utf-8"));
+    return carsData;
+}
 function saveUsers(users) {
     fs_1.default.writeFileSync(USERS_DB, JSON.stringify(users, null, 2), "utf-8");
 }

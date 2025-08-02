@@ -2,12 +2,19 @@
 
 import { join } from "path";
 import fs from "fs";
-import { User } from "./types";
+import { Car, User } from "./types";
 import { IncomingMessage, ServerResponse } from "http";
 import { getData } from "./utlis";
 import { generateToken, setAuthCookie } from "./auth";
 
 const USERS_DB = join(__dirname, "..", "db", "users.json");
+const CARS_DB = join(__dirname, "..", "db", "cars.json");
+
+export function getCars(): Car[] {
+  if (!fs.existsSync(CARS_DB)) return [];
+  const carsData = JSON.parse(fs.readFileSync(CARS_DB, "utf-8"));
+  return carsData;
+}
 
 export function saveUsers(users: User[]): void {
   fs.writeFileSync(USERS_DB, JSON.stringify(users, null, 2), "utf-8");

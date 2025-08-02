@@ -97,6 +97,19 @@ const server = (0, http_1.createServer)(async (req, res) => {
     }
     if (method === "POST" && pathname === "/login")
         return (0, db_1.loginUser)(res, req);
+    if (method === "GET" && pathname === "/cars") {
+        const carsData = (0, db_1.getCars)();
+        if (!carsData) {
+            res
+                .writeHead(400, { "content-type": "application/json" })
+                .end({ error: "Błąd przy pobieraniu danych samochodów." });
+            return;
+        }
+        res
+            .writeHead(200, { "content-type": "application/json" })
+            .end(JSON.stringify(carsData));
+        return;
+    }
     res.end(JSON.stringify({ status: "ok" }));
     // 1. Obsługa endpointów
     // 2. Proste serwowanie plików statycznych z katalogu frontend (np. pod ścieżką /static/)

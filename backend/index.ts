@@ -3,7 +3,7 @@ import fs from "fs";
 import url from "url";
 import path from "path";
 import { Mimes } from "./types";
-import { getUsers, loginUser, registerUser, saveUsers } from "./db";
+import { getCars, getUsers, loginUser, registerUser, saveUsers } from "./db";
 import { getUserFromToken, parseCookies } from "./auth";
 import { getData } from "./utlis";
 
@@ -106,6 +106,20 @@ const server = createServer(
     }
 
     if (method === "POST" && pathname === "/login") return loginUser(res, req);
+
+    if (method === "GET" && pathname === "/cars") {
+      const carsData = getCars();
+      if (!carsData) {
+        res
+          .writeHead(400, { "content-type": "application/json" })
+          .end({ error: "Błąd przy pobieraniu danych samochodów." });
+        return;
+      }
+      res
+        .writeHead(200, { "content-type": "application/json" })
+        .end(JSON.stringify(carsData));
+      return;
+    }
 
     res.end(JSON.stringify({ status: "ok" }));
     // 1. Obsługa endpointów
