@@ -3,7 +3,14 @@ import fs from "fs";
 import url from "url";
 import path from "path";
 import { Mimes } from "./types";
-import { getCars, getUsers, loginUser, registerUser, saveUsers } from "./db";
+import {
+  addCar,
+  getCars,
+  getUsers,
+  loginUser,
+  registerUser,
+  saveUsers,
+} from "./db";
 import { getUserFromToken, parseCookies } from "./auth";
 import { getData } from "./utlis";
 
@@ -119,6 +126,10 @@ const server = createServer(
         .writeHead(200, { "content-type": "application/json" })
         .end(JSON.stringify(carsData));
       return;
+    }
+
+    if (method === "POST" && pathname === "/cars") {
+      return addCar(res, req);
     }
 
     res.end(JSON.stringify({ status: "ok" }));

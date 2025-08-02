@@ -5,8 +5,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCars = getCars;
+exports.saveCars = saveCars;
 exports.saveUsers = saveUsers;
 exports.getUsers = getUsers;
+exports.addCar = addCar;
 exports.registerUser = registerUser;
 exports.loginUser = loginUser;
 const path_1 = require("path");
@@ -21,6 +23,9 @@ function getCars() {
     const carsData = JSON.parse(fs_1.default.readFileSync(CARS_DB, "utf-8"));
     return carsData;
 }
+function saveCars(cars) {
+    fs_1.default.writeFileSync(CARS_DB, JSON.stringify(cars, null, 2), "utf-8");
+}
 function saveUsers(users) {
     fs_1.default.writeFileSync(USERS_DB, JSON.stringify(users, null, 2), "utf-8");
 }
@@ -29,6 +34,31 @@ function getUsers() {
         return [];
     const usersData = JSON.parse(fs_1.default.readFileSync(USERS_DB, "utf-8"));
     return usersData;
+}
+async function addCar(res, req) {
+    const { token } = (0, auth_1.parseCookies)(req);
+    const user = (0, auth_1.getUserFromToken)(token);
+    if ((user === null || user === void 0 ? void 0 : user.role) !== "admin") {
+        res
+            .writeHead(400, { "content-type": "application/json" })
+            .end(JSON.stringify({ error: "Tylko admin może dodawać samochody." }));
+    }
+    else {
+        const cars = getCars();
+        const body = await (0, utlis_1.getData)(req);
+        const { model, price } = await JSON.parse(body);
+        const newCar = {
+            id: `${model}${Date.now()}`,
+            model,
+            price,
+            ownerId: "",
+        };
+        cars.push(newCar);
+        saveCars(cars);
+        res
+            .writeHead(201, { "content-type": "application/json" })
+            .end(JSON.stringify({}));
+    }
 }
 async function registerUser(res, req) {
     const body = await (0, utlis_1.getData)(req);
