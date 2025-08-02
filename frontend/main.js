@@ -218,7 +218,7 @@ function setupEventListeners() {
       });
       const data = await res.json();
       if (res.status === 200) {
-        showMessage("Profil zaktualizowany", "success");
+        showMessage(data.message || "Profil zaktualizowany", "success");
         await checkAuth();
         loadProfile();
       } else {

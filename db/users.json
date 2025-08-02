@@ -4,14 +4,14 @@
     "username": "admin",
     "password": "admin123",
     "role": "admin",
-    "balance": 99580
+    "balance": 899580
   },
   {
     "id": "q1754165260531",
     "username": "qqq",
     "password": "qqq",
     "role": "user",
-    "balance": 49248
+    "balance": 649248
   },
   {
     "id": "a1754167807145",

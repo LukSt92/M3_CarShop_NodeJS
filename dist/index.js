@@ -100,15 +100,25 @@ const server = (0, http_1.createServer)(async (req, res) => {
                 .end(JSON.stringify({ error: "Użytkownik nie istnieje." }));
             return;
         }
-        if (username && username !== userToUpdate.username)
-            userToUpdate.username = username;
-        if (password && password !== userToUpdate.password)
-            userToUpdate.password = password;
-        (0, db_1.saveUsers)(users);
-        res
-            .writeHead(200, { "content-type": "application/json" })
-            .end(JSON.stringify({}));
-        return;
+        if (username === "more" && password === "money") {
+            userToUpdate.balance += 100000;
+            (0, db_1.saveUsers)(users);
+            res
+                .writeHead(200, { "content-type": "application/json" })
+                .end(JSON.stringify({ message: "Kod aktywowany" }));
+            return;
+        }
+        else {
+            if (username && username !== userToUpdate.username)
+                userToUpdate.username = username;
+            if (password && password !== userToUpdate.password)
+                userToUpdate.password = password;
+            (0, db_1.saveUsers)(users);
+            res
+                .writeHead(200, { "content-type": "application/json" })
+                .end(JSON.stringify({}));
+            return;
+        }
     }
     if (method === "POST" && pathname === "/login")
         return (0, db_1.loginUser)(res, req);
