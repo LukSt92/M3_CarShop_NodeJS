@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.activeUsers = void 0;
 const http_1 = require("http");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
@@ -25,6 +26,7 @@ const sendFile = (res, filePath) => {
         res.end(data);
     });
 };
+exports.activeUsers = [];
 const server = (0, http_1.createServer)(async (req, res) => {
     const pathname = req.url;
     const method = req.method;
@@ -34,6 +36,19 @@ const server = (0, http_1.createServer)(async (req, res) => {
         return sendFile(res, `${frontendPath}/style.css`);
     if (method === "GET" && (pathname === null || pathname === void 0 ? void 0 : pathname.startsWith("/main.js")))
         return sendFile(res, `${frontendPath}/main.js`);
+    if (pathname === "/sse") {
+        res.writeHead(200, {
+            "Content-Type": "text/event-stream",
+            "Cache-Control": "no-cache",
+            Connection: "keep-alive",
+        });
+        res.write("Connected to server\n\n");
+        exports.activeUsers.push(res);
+        req.on("close", () => {
+            exports.activeUsers.splice(exports.activeUsers.indexOf(res), 1);
+        });
+        return;
+    }
     if (method === "POST" && pathname === "/register")
         return (0, db_1.registerUser)(res, req);
     // TODO dodać ciasteczko i za jego pomocą sprawdzić czy użytkownik jest zalogowany oraz czy jest adminem.

@@ -32,6 +32,8 @@ const sendFile = (res: ServerResponse, filePath: string): void => {
   });
 };
 
+export const activeUsers: ServerResponse[] = [];
+
 const server = createServer(
   async (req: IncomingMessage, res: ServerResponse) => {
     const pathname = req.url;
@@ -43,6 +45,22 @@ const server = createServer(
       return sendFile(res, `${frontendPath}/style.css`);
     if (method === "GET" && pathname?.startsWith("/main.js"))
       return sendFile(res, `${frontendPath}/main.js`);
+
+    if (pathname === "/sse") {
+      res.writeHead(200, {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+      });
+
+      res.write("Connected to server\n\n");
+      activeUsers.push(res);
+
+      req.on("close", () => {
+        activeUsers.splice(activeUsers.indexOf(res), 1);
+      });
+      return;
+    }
 
     if (method === "POST" && pathname === "/register")
       return registerUser(res, req);

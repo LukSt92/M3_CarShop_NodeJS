@@ -11,6 +11,7 @@ import {
   parseCookies,
   setAuthCookie,
 } from "./auth";
+import { activeUsers } from ".";
 
 const USERS_DB = join(__dirname, "..", "db", "users.json");
 const CARS_DB = join(__dirname, "..", "db", "cars.json");
@@ -68,14 +69,39 @@ export async function updateCar(
         })
       );
     } else {
+      const sseData = {
+        event: "purchase",
+        carId: car.id,
+        buyerId: user.id,
+      };
+
       user.balance -= car.price;
       saveUsers(users);
       car.ownerId = user.id;
       saveCars(cars);
+
+      activeUsers.forEach((u) => {
+        u.write(`data: ${JSON.stringify(sseData)}\n\n`);
+      });
+
       res
         .writeHead(200, { "content-type": "application/json" })
         .end(JSON.stringify({}));
+      return;
     }
+  } else if (!car) {
+    res.writeHead(400, { "content-type": "application/json" }).end(
+      JSON.stringify({
+        error:
+          "Nie znaleziono takiego samochodu. Wprowadź poprawne ID samochodu.",
+      })
+    );
+  } else {
+    res.writeHead(400, { "content-type": "application/json" }).end(
+      JSON.stringify({
+        error: "Błąd autoryzacji użytkownika.",
+      })
+    );
   }
 }
 

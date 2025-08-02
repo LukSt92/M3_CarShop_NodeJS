@@ -299,16 +299,18 @@ function route() {
 /**
  * Ustawia nasłuchiwanie Server-Sent Events, które wyświetlają powiadomienia o zdarzeniach (np. zakupie samochodu).
  */
-// function setupSSE() {
-//   const evtSource = new EventSource('/sse');
-//   evtSource.onmessage = (event) => {
-//     const msg = JSON.parse(event.data);
-//     showNotification(`SSE: ${msg.event} - Car ID: ${msg.carId}, Buyer ID: ${msg.buyerId}`);
-//   };
-// }
+function setupSSE() {
+  const evtSource = new EventSource("/sse");
+  evtSource.onmessage = (event) => {
+    const msg = JSON.parse(event.data);
+    showNotification(
+      `SSE: ${msg.event} - Car ID: ${msg.carId}, Buyer ID: ${msg.buyerId}`
+    );
+  };
+}
 
 window.addEventListener("load", async () => {
   await checkAuth();
   setupEventListeners();
-  // setupSSE();
+  setupSSE();
 });
