@@ -9,14 +9,14 @@ exports.setAuthCookie = setAuthCookie;
 exports.parseCookies = parseCookies;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const db_1 = require("./db");
-const SECRET = "SECRET";
+const variables_1 = require("./variables");
 function generateToken(userId) {
-    const token = jsonwebtoken_1.default.sign({ id: userId }, SECRET);
+    const token = jsonwebtoken_1.default.sign({ id: userId }, variables_1.SECRET);
     return token;
 }
 function getUserFromToken(token) {
     try {
-        const userToken = jsonwebtoken_1.default.verify(token, SECRET);
+        const userToken = jsonwebtoken_1.default.verify(token, variables_1.SECRET);
         const users = (0, db_1.getUsers)();
         if (typeof userToken === "object") {
             const user = users.find((u) => userToken.id === u.id);

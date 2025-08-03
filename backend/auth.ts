@@ -2,8 +2,7 @@ import jwt from "jsonwebtoken";
 import { ServerResponse, IncomingMessage } from "http";
 import { getUsers } from "./db";
 import { User } from "./types";
-
-const SECRET = "SECRET";
+import { SECRET } from "./variables";
 
 export function generateToken(userId: string): string {
   const token = jwt.sign({ id: userId }, SECRET);

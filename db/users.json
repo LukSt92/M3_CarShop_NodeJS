@@ -19,5 +19,19 @@
     "password": "a",
     "role": "user",
     "balance": 50000
+  },
+  {
+    "id": "sdsd1754178479576",
+    "username": "sd",
+    "password": "sd",
+    "role": "user",
+    "balance": 150000
+  },
+  {
+    "id": "aa1754179177456",
+    "username": "aa",
+    "password": "aa",
+    "role": "user",
+    "balance": 50000
   }
 ]
