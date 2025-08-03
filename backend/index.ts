@@ -12,6 +12,7 @@ import {
   sseHandler,
   deleteUser,
   editCar,
+  deleteCar,
 } from "./routes";
 
 const PORT = 3000;
@@ -58,6 +59,9 @@ const server = createServer(
       return updateCar(res, req, pathname);
 
     if (method === "PUT" && carPathname) return editCar(res, req, carPathname);
+
+    if (method === "DELETE" && carPathname)
+      return deleteCar(res, req, carPathname);
 
     res.end(JSON.stringify({ status: "ok" }));
     // 1. Obsługa endpointów

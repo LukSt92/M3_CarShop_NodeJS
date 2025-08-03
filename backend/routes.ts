@@ -347,3 +347,32 @@ export async function editCar(
     return;
   }
 }
+
+export async function deleteCar(
+  res: ServerResponse,
+  req: IncomingMessage,
+  pathname: RegExpMatchArray
+) {
+  const carIdToDelete = pathname[1];
+  const cars = getCars();
+  const carToDelete = cars.find((c) => c.id === carIdToDelete);
+  const cookies = parseCookies(req);
+  const currentUser = getUserFromToken(cookies.token);
+
+  if (currentUser?.role === "admin") {
+    res
+      .writeHead(400, { "content-type": "application/json" })
+      .end(JSON.stringify({ error: "Tylko admin może usuwać samochody." }));
+    return;
+  } else {
+    const newCars = cars.filter((c) => c.id !== carToDelete?.id);
+
+    saveCars(newCars);
+    res.writeHead(200, { "content-type": "application/json" }).end(
+      JSON.stringify({
+        message: `Usunięto samochód o id: ${carIdToDelete}`,
+      })
+    );
+    return;
+  }
+}
