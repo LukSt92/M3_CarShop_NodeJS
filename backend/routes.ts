@@ -182,7 +182,7 @@ export async function deleteUser(
   const cookies = parseCookies(req);
   const currentUser = getUserFromToken(cookies.token);
 
-  if (currentUser?.id !== userToDelete?.id || currentUser.role === "admin") {
+  if (currentUser?.id !== userToDelete?.id || currentUser?.role === "admin") {
     res
       .writeHead(400, { "content-type": "application/json" })
       .end(JSON.stringify({ error: "Nie ma hackowania." }));
@@ -305,5 +305,45 @@ export async function updateCar(
         error: "Błąd autoryzacji użytkownika.",
       })
     );
+  }
+}
+export async function editCar(
+  res: ServerResponse,
+  req: IncomingMessage,
+  pathname: RegExpMatchArray
+) {
+  const carIdToUpdate = pathname[1];
+  const cars = getCars();
+  const carToUpdate = cars.find((c) => c.id === carIdToUpdate);
+  const body = await getData(req);
+  const { model, price, ownerId } = await JSON.parse(body);
+  const cookies = parseCookies(req);
+  const currentUser = getUserFromToken(cookies.token);
+
+  if (currentUser?.role !== "admin") {
+    res
+      .writeHead(400, { "content-type": "application/json" })
+      .end(
+        JSON.stringify({ error: "Tylko admin może zmieniać dane samochodów." })
+      );
+    return;
+  } else if (!carToUpdate) {
+    res
+      .writeHead(400, { "content-type": "application/json" })
+      .end(JSON.stringify({ error: "Dany samochód nie istnieje." }));
+    return;
+  } else {
+    if (model && model !== carToUpdate.model) carToUpdate.model = model;
+    if (price && price !== carToUpdate.price) carToUpdate.price = price;
+    if (ownerId && ownerId !== carToUpdate.ownerId)
+      carToUpdate.ownerId = ownerId;
+
+    saveCars(cars);
+    res
+      .writeHead(200, { "content-type": "application/json" })
+      .end(
+        JSON.stringify({ message: "dane samochodu zostały zaktualizowane." })
+      );
+    return;
   }
 }

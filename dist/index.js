@@ -13,6 +13,7 @@ const server = (0, http_1.createServer)(async (req, res) => {
     const pathname = req.url;
     const method = req.method;
     const userPathname = pathname === null || pathname === void 0 ? void 0 : pathname.match(/^\/users\/([^\/]+)$/);
+    const carPathname = pathname === null || pathname === void 0 ? void 0 : pathname.match(/^\/cars\/([^\/]+)$/);
     if (method === "GET" && pathname === "/")
         return (0, utilis_1.sendFile)(res, `${frontendPath}/index.html`);
     if (method === "GET" && (pathname === null || pathname === void 0 ? void 0 : pathname.startsWith("/style.css")))
@@ -39,6 +40,8 @@ const server = (0, http_1.createServer)(async (req, res) => {
     }
     if (method === "POST" && (pathname === null || pathname === void 0 ? void 0 : pathname.endsWith("/buy")))
         return (0, routes_1.updateCar)(res, req, pathname);
+    if (method === "PUT" && carPathname)
+        return (0, routes_1.editCar)(res, req, carPathname);
     res.end(JSON.stringify({ status: "ok" }));
     // 1. Obsługa endpointów
     // 2. Proste serwowanie plików statycznych z katalogu frontend (np. pod ścieżką /static/)

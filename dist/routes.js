@@ -9,6 +9,7 @@ exports.deleteUser = deleteUser;
 exports.showCars = showCars;
 exports.addCar = addCar;
 exports.updateCar = updateCar;
+exports.editCar = editCar;
 const utilis_1 = require("./utilis");
 const auth_1 = require("./auth");
 const db_1 = require("./db");
@@ -148,7 +149,7 @@ async function deleteUser(res, req, pathname) {
     const userToDelete = users.find((u) => u.id === userIdToDelete);
     const cookies = (0, auth_1.parseCookies)(req);
     const currentUser = (0, auth_1.getUserFromToken)(cookies.token);
-    if ((currentUser === null || currentUser === void 0 ? void 0 : currentUser.id) !== (userToDelete === null || userToDelete === void 0 ? void 0 : userToDelete.id) || currentUser.role === "admin") {
+    if ((currentUser === null || currentUser === void 0 ? void 0 : currentUser.id) !== (userToDelete === null || userToDelete === void 0 ? void 0 : userToDelete.id) || (currentUser === null || currentUser === void 0 ? void 0 : currentUser.role) === "admin") {
         res
             .writeHead(400, { "content-type": "application/json" })
             .end(JSON.stringify({ error: "Nie ma hackowania." }));
@@ -250,5 +251,39 @@ async function updateCar(res, req, pathname) {
         res.writeHead(400, { "content-type": "application/json" }).end(JSON.stringify({
             error: "Błąd autoryzacji użytkownika.",
         }));
+    }
+}
+async function editCar(res, req, pathname) {
+    const carIdToUpdate = pathname[1];
+    const cars = (0, db_1.getCars)();
+    const carToUpdate = cars.find((c) => c.id === carIdToUpdate);
+    const body = await (0, utilis_1.getData)(req);
+    const { model, price, ownerId } = await JSON.parse(body);
+    const cookies = (0, auth_1.parseCookies)(req);
+    const currentUser = (0, auth_1.getUserFromToken)(cookies.token);
+    if ((currentUser === null || currentUser === void 0 ? void 0 : currentUser.role) !== "admin") {
+        res
+            .writeHead(400, { "content-type": "application/json" })
+            .end(JSON.stringify({ error: "Tylko admin może zmieniać dane samochodów." }));
+        return;
+    }
+    else if (!carToUpdate) {
+        res
+            .writeHead(400, { "content-type": "application/json" })
+            .end(JSON.stringify({ error: "Dany samochód nie istnieje." }));
+        return;
+    }
+    else {
+        if (model && model !== carToUpdate.model)
+            carToUpdate.model = model;
+        if (price && price !== carToUpdate.price)
+            carToUpdate.price = price;
+        if (ownerId && ownerId !== carToUpdate.ownerId)
+            carToUpdate.ownerId = ownerId;
+        (0, db_1.saveCars)(cars);
+        res
+            .writeHead(200, { "content-type": "application/json" })
+            .end(JSON.stringify({ message: "dane samochodu zostały zaktualizowane." }));
+        return;
     }
 }

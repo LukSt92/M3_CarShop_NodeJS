@@ -11,6 +11,7 @@ import {
   showCars,
   sseHandler,
   deleteUser,
+  editCar,
 } from "./routes";
 
 const PORT = 3000;
@@ -21,6 +22,7 @@ const server = createServer(
     const pathname = req.url;
     const method = req.method;
     const userPathname = pathname?.match(/^\/users\/([^\/]+)$/);
+    const carPathname = pathname?.match(/^\/cars\/([^\/]+)$/);
 
     if (method === "GET" && pathname === "/")
       return sendFile(res, `${frontendPath}/index.html`);
@@ -54,6 +56,8 @@ const server = createServer(
 
     if (method === "POST" && pathname?.endsWith("/buy"))
       return updateCar(res, req, pathname);
+
+    if (method === "PUT" && carPathname) return editCar(res, req, carPathname);
 
     res.end(JSON.stringify({ status: "ok" }));
     // 1. Obsługa endpointów
