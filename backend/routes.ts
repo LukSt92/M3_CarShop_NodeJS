@@ -130,7 +130,7 @@ export async function updateUser(
   res: ServerResponse,
   req: IncomingMessage,
   pathname: RegExpMatchArray
-) {
+): Promise<void> {
   const userIdToUpdate = pathname[1];
   const users = getUsers();
   const userToUpdate = users.find((u) => u.id === userIdToUpdate);
@@ -175,14 +175,14 @@ export async function deleteUser(
   res: ServerResponse,
   req: IncomingMessage,
   pathname: RegExpMatchArray
-) {
+): Promise<void> {
   const userIdToDelete = pathname[1];
   const users = getUsers();
   const userToDelete = users.find((u) => u.id === userIdToDelete);
   const cookies = parseCookies(req);
   const currentUser = getUserFromToken(cookies.token);
 
-  if (currentUser?.id !== userToDelete?.id || currentUser?.role === "admin") {
+  if (currentUser?.id !== userToDelete?.id || currentUser?.role !== "admin") {
     res
       .writeHead(400, { "content-type": "application/json" })
       .end(JSON.stringify({ error: "Nie ma hackowania." }));
@@ -200,7 +200,10 @@ export async function deleteUser(
   }
 }
 
-export async function showCars(res: ServerResponse, req: IncomingMessage) {
+export async function showCars(
+  res: ServerResponse,
+  req: IncomingMessage
+): Promise<void> {
   const carsData = getCars();
   if (!carsData) {
     res
@@ -311,7 +314,7 @@ export async function editCar(
   res: ServerResponse,
   req: IncomingMessage,
   pathname: RegExpMatchArray
-) {
+): Promise<void> {
   const carIdToUpdate = pathname[1];
   const cars = getCars();
   const carToUpdate = cars.find((c) => c.id === carIdToUpdate);
@@ -352,14 +355,14 @@ export async function deleteCar(
   res: ServerResponse,
   req: IncomingMessage,
   pathname: RegExpMatchArray
-) {
+): Promise<void> {
   const carIdToDelete = pathname[1];
   const cars = getCars();
   const carToDelete = cars.find((c) => c.id === carIdToDelete);
   const cookies = parseCookies(req);
   const currentUser = getUserFromToken(cookies.token);
 
-  if (currentUser?.role === "admin") {
+  if (currentUser?.role !== "admin") {
     res
       .writeHead(400, { "content-type": "application/json" })
       .end(JSON.stringify({ error: "Tylko admin może usuwać samochody." }));
