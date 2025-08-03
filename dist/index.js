@@ -12,7 +12,7 @@ const frontendPath = path_1.default.join(__dirname, "..", "frontend");
 const server = (0, http_1.createServer)(async (req, res) => {
     const pathname = req.url;
     const method = req.method;
-    const putUserPathname = pathname === null || pathname === void 0 ? void 0 : pathname.match(/^\/users\/([^\/]+)$/);
+    const userPathname = pathname === null || pathname === void 0 ? void 0 : pathname.match(/^\/users\/([^\/]+)$/);
     if (method === "GET" && pathname === "/")
         return (0, utilis_1.sendFile)(res, `${frontendPath}/index.html`);
     if (method === "GET" && (pathname === null || pathname === void 0 ? void 0 : pathname.startsWith("/style.css")))
@@ -25,8 +25,10 @@ const server = (0, http_1.createServer)(async (req, res) => {
         return (0, routes_1.registerUser)(res, req);
     if (method === "GET" && pathname === "/users")
         return (0, routes_1.authUser)(res, req);
-    if (method === "PUT" && putUserPathname)
-        return (0, routes_1.updateUser)(res, req, putUserPathname);
+    if (method === "PUT" && userPathname)
+        return (0, routes_1.updateUser)(res, req, userPathname);
+    if (method === "DELETE" && userPathname)
+        return (0, routes_1.deleteUser)(res, req, userPathname);
     if (method === "POST" && pathname === "/login")
         return (0, routes_1.loginUser)(res, req);
     if (method === "GET" && pathname === "/cars") {

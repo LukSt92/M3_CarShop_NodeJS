@@ -19,7 +19,7 @@ export function getUserFromToken(token: string): User | null {
       return user || null;
     }
   } catch (e) {
-    console.error("Token jest nieaktualny", e);
+    console.error("Token jest nieaktualny");
   }
   return null;
 }

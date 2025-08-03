@@ -24,7 +24,7 @@ function getUserFromToken(token) {
         }
     }
     catch (e) {
-        console.error("Token jest nieaktualny", e);
+        console.error("Token jest nieaktualny");
     }
     return null;
 }

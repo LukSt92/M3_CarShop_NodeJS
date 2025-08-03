@@ -10,6 +10,7 @@ import {
   updateUser,
   showCars,
   sseHandler,
+  deleteUser,
 } from "./routes";
 
 const PORT = 3000;
@@ -19,7 +20,7 @@ const server = createServer(
   async (req: IncomingMessage, res: ServerResponse) => {
     const pathname = req.url;
     const method = req.method;
-    const putUserPathname = pathname?.match(/^\/users\/([^\/]+)$/);
+    const userPathname = pathname?.match(/^\/users\/([^\/]+)$/);
 
     if (method === "GET" && pathname === "/")
       return sendFile(res, `${frontendPath}/index.html`);
@@ -35,8 +36,11 @@ const server = createServer(
 
     if (method === "GET" && pathname === "/users") return authUser(res, req);
 
-    if (method === "PUT" && putUserPathname)
-      return updateUser(res, req, putUserPathname);
+    if (method === "PUT" && userPathname)
+      return updateUser(res, req, userPathname);
+
+    if (method === "DELETE" && userPathname)
+      return deleteUser(res, req, userPathname);
 
     if (method === "POST" && pathname === "/login") return loginUser(res, req);
 

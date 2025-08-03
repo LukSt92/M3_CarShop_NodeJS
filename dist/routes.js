@@ -5,6 +5,7 @@ exports.authUser = authUser;
 exports.registerUser = registerUser;
 exports.loginUser = loginUser;
 exports.updateUser = updateUser;
+exports.deleteUser = deleteUser;
 exports.showCars = showCars;
 exports.addCar = addCar;
 exports.updateCar = updateCar;
@@ -20,7 +21,6 @@ async function sseHandler(res, req) {
     });
     res.write("Connected to server\n\n");
     activeUsers.push(res);
-    console.log("SSE START");
     req.on("close", () => {
         activeUsers.splice(activeUsers.indexOf(res), 1);
     });
@@ -108,7 +108,15 @@ async function updateUser(res, req, pathname) {
     const userToUpdate = users.find((u) => u.id === userIdToUpdate);
     const body = await (0, utilis_1.getData)(req);
     const { username, password } = await JSON.parse(body);
-    if (!userToUpdate) {
+    const cookies = (0, auth_1.parseCookies)(req);
+    const currentUser = (0, auth_1.getUserFromToken)(cookies.token);
+    if ((currentUser === null || currentUser === void 0 ? void 0 : currentUser.id) !== (userToUpdate === null || userToUpdate === void 0 ? void 0 : userToUpdate.id)) {
+        res
+            .writeHead(400, { "content-type": "application/json" })
+            .end(JSON.stringify({ error: "Nie ma hackowania." }));
+        return;
+    }
+    else if (!userToUpdate) {
         res
             .writeHead(400, { "content-type": "application/json" })
             .end(JSON.stringify({ error: "Użytkownik nie istnieje." }));
@@ -131,6 +139,27 @@ async function updateUser(res, req, pathname) {
         res
             .writeHead(200, { "content-type": "application/json" })
             .end(JSON.stringify({}));
+        return;
+    }
+}
+async function deleteUser(res, req, pathname) {
+    const userIdToDelete = pathname[1];
+    const users = (0, db_1.getUsers)();
+    const userToDelete = users.find((u) => u.id === userIdToDelete);
+    const cookies = (0, auth_1.parseCookies)(req);
+    const currentUser = (0, auth_1.getUserFromToken)(cookies.token);
+    if ((currentUser === null || currentUser === void 0 ? void 0 : currentUser.id) !== (userToDelete === null || userToDelete === void 0 ? void 0 : userToDelete.id) || currentUser.role === "admin") {
+        res
+            .writeHead(400, { "content-type": "application/json" })
+            .end(JSON.stringify({ error: "Nie ma hackowania." }));
+        return;
+    }
+    else {
+        const newUsers = users.filter((u) => u.id !== (userToDelete === null || userToDelete === void 0 ? void 0 : userToDelete.id));
+        (0, db_1.saveUsers)(newUsers);
+        res.writeHead(200, { "content-type": "application/json" }).end(JSON.stringify({
+            message: `Usunięto użytkownika o id: ${userIdToDelete}`,
+        }));
         return;
     }
 }

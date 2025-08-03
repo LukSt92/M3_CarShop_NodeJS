@@ -20,7 +20,6 @@ export async function sseHandler(res: ServerResponse, req: IncomingMessage) {
 
   res.write("Connected to server\n\n");
   activeUsers.push(res);
-  console.log("SSE START");
 
   req.on("close", () => {
     activeUsers.splice(activeUsers.indexOf(res), 1);
@@ -137,8 +136,15 @@ export async function updateUser(
   const userToUpdate = users.find((u) => u.id === userIdToUpdate);
   const body = await getData(req);
   const { username, password } = await JSON.parse(body);
+  const cookies = parseCookies(req);
+  const currentUser = getUserFromToken(cookies.token);
 
-  if (!userToUpdate) {
+  if (currentUser?.id !== userToUpdate?.id) {
+    res
+      .writeHead(400, { "content-type": "application/json" })
+      .end(JSON.stringify({ error: "Nie ma hackowania." }));
+    return;
+  } else if (!userToUpdate) {
     res
       .writeHead(400, { "content-type": "application/json" })
       .end(JSON.stringify({ error: "Użytkownik nie istnieje." }));
@@ -161,6 +167,35 @@ export async function updateUser(
     res
       .writeHead(200, { "content-type": "application/json" })
       .end(JSON.stringify({}));
+    return;
+  }
+}
+
+export async function deleteUser(
+  res: ServerResponse,
+  req: IncomingMessage,
+  pathname: RegExpMatchArray
+) {
+  const userIdToDelete = pathname[1];
+  const users = getUsers();
+  const userToDelete = users.find((u) => u.id === userIdToDelete);
+  const cookies = parseCookies(req);
+  const currentUser = getUserFromToken(cookies.token);
+
+  if (currentUser?.id !== userToDelete?.id || currentUser.role === "admin") {
+    res
+      .writeHead(400, { "content-type": "application/json" })
+      .end(JSON.stringify({ error: "Nie ma hackowania." }));
+    return;
+  } else {
+    const newUsers = users.filter((u) => u.id !== userToDelete?.id);
+
+    saveUsers(newUsers);
+    res.writeHead(200, { "content-type": "application/json" }).end(
+      JSON.stringify({
+        message: `Usunięto użytkownika o id: ${userIdToDelete}`,
+      })
+    );
     return;
   }
 }
