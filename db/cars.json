@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "id": "test22",
+    "model": "Audi A5",
+    "price": 80000,
+    "ownerId": "admin001"
+  },
+  {
+    "id": "sd1754169102890",
+    "model": "sd",
+    "price": 22,
+    "ownerId": "admin001"
+  },
+  {
+    "id": "sd21754169205418",
+    "model": "sd2",
+    "price": 22,
+    "ownerId": "admin001"
+  },
+  {
+    "id": "asdasd1754171897075",
+    "model": "asdasd",
+    "price": 354,
+    "ownerId": "q1754165260531"
+  }
+]
